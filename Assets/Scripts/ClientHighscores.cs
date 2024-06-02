@@ -1,3 +1,5 @@
+using System;
+
 using TMPro;
 
 using UnityEngine;
@@ -46,7 +48,7 @@ public class ClientHighscores : MonoBehaviour
 
             hiScore.transform.GetChild(0).GetComponent<TMP_Text>().text = (i + 1).ToString();
             hiScore.transform.GetChild(1).GetComponent<TMP_Text>().text = hs.highscores[i].username;
-            hiScore.transform.GetChild(2).GetComponent<TMP_Text>().text = hs.highscores[i].winRatio + "%";
+            hiScore.transform.GetChild(2).GetComponent<TMP_Text>().text = (Convert.ToSingle(hs.highscores[i].winRatio) * 100) + "%";
             hiScore.transform.GetChild(3).GetComponent<TMP_Text>().text = hs.highscores[i].averageScore + "m";
             hiScore.transform.GetChild(4).GetComponent<TMP_Text>().text = hs.highscores[i].gamesPlayed;
         }
