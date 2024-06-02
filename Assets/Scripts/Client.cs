@@ -1,18 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
 using Unity.Networking.Transport;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Client : MonoBehaviour
 {
-    NetworkDriver m_Driver;
-    NetworkConnection m_Connection;
+    public static string serverIP = "192.168.2.225";
+
     private MessageHandler msgHandler;
 
-    public static string serverIP = "192.168.2.225";
+    private NetworkDriver m_Driver;
+    private NetworkConnection m_Connection;
 
     private void Start()
     {
@@ -39,12 +37,6 @@ public class Client : MonoBehaviour
         if (!m_Connection.IsCreated) { return; }
 
         HandleConnection();
-    }
-
-    public void Disconnect()
-    {
-        m_Connection.Disconnect(m_Driver);
-        m_Connection = default;
     }
 
     private void HandleConnection()
@@ -91,11 +83,17 @@ public class Client : MonoBehaviour
                     case MessageHandler.CommandType.WinLose:
                         msgHandler.C_WinLose(message);
                         break;
+                    case MessageHandler.CommandType.Tie:
+                        msgHandler.C_Tie(message);
+                        break;
                     case MessageHandler.CommandType.NewGameAccept:
                         msgHandler.C_NewGame();
                         break;
                     case MessageHandler.CommandType.HighscoreAccept:
-                        GetComponent<ClientHighscores>().LoadHighscores(message.type);
+                        GetComponent<ClientHighscores>().LoadHighscores(message.message);
+                        break;
+                    case MessageHandler.CommandType.Error:
+                        msgHandler.C_ShowError(message.message);
                         break;
                 }
             }
@@ -117,5 +115,13 @@ public class Client : MonoBehaviour
             writer.WriteFixedString512(json);
             m_Driver.EndSend(writer);
         }
+    }
+
+    public void Disconnect()
+    {
+        m_Connection.Disconnect(m_Driver);
+        m_Connection = default;
+
+        SceneManager.LoadScene(0);
     }
 }

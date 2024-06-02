@@ -9,6 +9,7 @@ public class ClientUserSignup : MonoBehaviour
     public TMP_InputField usernameTMP;
     public TMP_InputField bdateTMP;
     public TMP_InputField passwordTMP;
+
     public void Signup()
     {
         DatabaseConnection.user = new User() { email = emailTMP.text, username = usernameTMP.text, birthdate = bdateTMP.text, password = passwordTMP.text };

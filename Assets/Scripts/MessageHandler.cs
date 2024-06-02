@@ -1,24 +1,21 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 using TMPro;
-
-using Unity.Collections;
-using Unity.Networking.Transport;
 
 using UnityEngine;
 
 public class MessageHandler : MonoBehaviour
 {
+    public TMP_Text serverError;
+
     public enum CommandType
     {
         None,               //empty
         CreateUserRequest,  //client requests server to create an account and login to it so that they may play
         UpdateUserRequest,  //client requests server to update data of the account
-        UpdateUserAccept,  //client requests server to update data of the account
-        LoginUserRequest,
-        LoginUserAccept,
+        UpdateUserAccept,   //client requests server to update data of the account
+        LoginUserRequest,   //client requests server to login this user and return their id and username
+        LoginUserAccept,    //server returns the id and username of the client that asked
         SetType,            //server sets the type of object for each client. so either circle or cross
         PlaceTypeRequest,   //client requests if the clicked position is available for placing a type
         PlaceTypeAccept,    //server returns if the position is available for placing
@@ -31,6 +28,7 @@ public class MessageHandler : MonoBehaviour
         NewGameAccept,      //server returns the new game state when both players requested a new game
         HighscoreRequest,   //client requests the highscore list to be shown to them
         HighscoreAccept,    //server returns the highscore list to the player that requested it
+        Error,              //server tells the client there was an error with their database request, and what the error was
     };
 
     public struct Message
@@ -40,6 +38,7 @@ public class MessageHandler : MonoBehaviour
         public string pos;
         public string type;
         public bool free;
+        public string message;
 
         public int userId;
         public string email;
@@ -50,13 +49,11 @@ public class MessageHandler : MonoBehaviour
     }
 
     private ClientTurn ct;
-    private PlayerInput pi;
     private ServerTurn st;
 
     private void Awake()
     {
         ct = FindObjectOfType<ClientTurn>();
-        pi = FindObjectOfType<PlayerInput>();
         st = FindObjectOfType<ServerTurn>();
     }
 
@@ -88,11 +85,21 @@ public class MessageHandler : MonoBehaviour
         return msg;
     }
 
+    public void C_ShowError(string _error)
+    {
+        serverError.text = _error;
+        Invoke("C_HideError", 1.5f);
+    }
+
+    private void C_HideError()
+    {
+        serverError.text = "";
+    }
+
     public void C_SetClickType(string _type)
     {
         ClickType c = (ClickType)Enum.Parse(typeof(ClickType), _type);
-        pi.type = c;
-        pi.turn = c == ClickType.Circle;
+        ct.SetType(c);
     }
 
     public Message C_PlaceType(string _pos)
@@ -103,7 +110,7 @@ public class MessageHandler : MonoBehaviour
             cmd = CommandType.DoTurn,
             userId = DatabaseConnection.userData.id,
             pos = _pos,
-            type = pi.type.ToString(),
+            type = ct.type.ToString(),
         };
     }
 
@@ -117,18 +124,6 @@ public class MessageHandler : MonoBehaviour
         {
             connId = DatabaseConnection.userData.connid,
             cmd = CommandType.InitGameRequest,
-            userId = DatabaseConnection.userData.id,
-        };
-
-        return msg;
-    }
-
-    public Message C_SendNewGameRequest()
-    {
-        Message msg = new Message()
-        {
-            connId = DatabaseConnection.userData.connid,
-            cmd = CommandType.NewGameRequest,
             userId = DatabaseConnection.userData.id,
         };
 
@@ -171,8 +166,6 @@ public class MessageHandler : MonoBehaviour
 
     public void C_ShowTurn(Message _incoming)
     {
-        pi.turn = !pi.turn;
-
         Vector2Int pos = new Vector2Int(Convert.ToInt32(_incoming.pos.Split(',')[0]), Convert.ToInt32(_incoming.pos.Split(',')[1]));
         ClickType type = (ClickType)Enum.Parse(typeof(ClickType), _incoming.type);
 
@@ -184,25 +177,19 @@ public class MessageHandler : MonoBehaviour
         C_ShowTurn(_incoming);
 
         ClickType type = (ClickType)Enum.Parse(typeof(ClickType), _incoming.type);
-        pi.EndGame(type);
+        ct.EndGame(type, Convert.ToInt32(_incoming.message));
+    }
+
+    public void C_Tie(Message _incoming)
+    {
+        C_ShowTurn(_incoming);
+
+        ct.TieGame();
     }
 
     public void C_NewGame()
     {
         ct.Restart();
-
-        switch (pi.type)
-        {
-            case ClickType.Circle:
-                pi.type = ClickType.Cross;
-                break;
-            case ClickType.Cross:
-                pi.type = ClickType.Circle;
-                break;
-            case ClickType.None:
-            default:
-                break;
-        }
     }
 
     public Message[] Sv_ClientJoin()

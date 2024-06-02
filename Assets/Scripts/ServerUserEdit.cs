@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -7,6 +6,7 @@ using UnityEngine.Networking;
 public class ServerUserEdit : MonoBehaviour
 {
     private Server server;
+
     private MessageHandler.Message updateMsg;
     private MessageHandler.Message returnMsg;
 
@@ -67,15 +67,25 @@ public class ServerUserEdit : MonoBehaviour
                     if (!string.IsNullOrWhiteSpace(webRequest.downloadHandler.text))
                     {
                         int err = JsonUtility.FromJson<ServerResult>(webRequest.downloadHandler.text.Substring(1)).error;
-                        Debug.Log(DBErrorHandler.ErrorMessage(err));
+                        Debug.Log(DatabaseConnection.ErrorMessage(err));
 
                         if (err == 1)
                         {
                             server.SendToClientId(updateMsg.userId, returnMsg);
                         }
+                        else if (err == 3)
+                        {
+                            GetComponent<ServerRelogin>().ReloginToServer();
+                        }
                         else
                         {
-                            //send error message to client?
+                            MessageHandler.Message msg = new MessageHandler.Message()
+                            {
+                                cmd = MessageHandler.CommandType.Error,
+                                message = DatabaseConnection.ErrorMessage(err),
+                            };
+
+                            server.SendToClientConn512(updateMsg.connId, msg);
                         }
                     }
                     break;

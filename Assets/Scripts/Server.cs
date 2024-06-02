@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,11 +9,13 @@ using UnityEngine;
 
 public class Server : MonoBehaviour
 {
-
-    private NetworkDriver m_Driver;
-    [NonSerialized] public NativeList<NetworkConnection> m_Connections;
     public static List<NetworkUser> users = new List<NetworkUser>();
+
+    [NonSerialized] public NativeList<NetworkConnection> m_Connections;
+    private NetworkDriver m_Driver;
+
     private MessageHandler msgHandler;
+
     private int playerCount = 0;
 
     private void Start()
@@ -140,8 +141,10 @@ public class Server : MonoBehaviour
                                 NetworkUser win = users.First(x => x.userId == message.userId);
                                 NetworkUser lose = users.First(x => x.userId != message.userId);
 
-                                GetComponent<ServerInsertScore>().InsertScore(win.userId, win.score, 1);
-                                GetComponent<ServerInsertScore>().InsertScore(lose.userId, 0, 0);
+                                returnMsg.message = win.score.ToString();
+
+                                GetComponent<ServerInsertScore>().InsertScore(this, win.userId, win.score, 1);
+                                GetComponent<ServerInsertScore>().InsertScore(this, lose.userId, 0, 0);
                             }
 
                             SendToClients(returnMsg);

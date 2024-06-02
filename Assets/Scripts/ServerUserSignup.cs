@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -39,7 +38,7 @@ public class ServerUserSignup : MonoBehaviour
                     break;
                 case UnityWebRequest.Result.Success:
                     int err = JsonUtility.FromJson<ServerResult>(webRequest.downloadHandler.text.Substring(1)).error;
-                    Debug.Log(DBErrorHandler.ErrorMessage(err));
+                    Debug.Log(DatabaseConnection.ErrorMessage(err));
 
                     if (err == 1)
                     {
@@ -52,9 +51,9 @@ public class ServerUserSignup : MonoBehaviour
 
                         GetComponent<ServerUserLogin>().LoginAsUser(server, msg);
                     }
-                    else
+                    else if (err == 3)
                     {
-                        //send error message to client?
+                        GetComponent<ServerRelogin>().ReloginToServer();
                     }
                     break;
             }

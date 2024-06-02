@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-
 using TMPro;
 
 using UnityEngine;
@@ -8,9 +5,10 @@ using UnityEngine;
 public class ClientHighscores : MonoBehaviour
 {
     public GameObject prefabHighscore;
-    public Transform highscoresHolder;
+
     public GameObject highscoresPage;
     public GameObject highscoresButton;
+    public Transform highscoresHolder;
 
     public void OpenHighscoreList()
     {

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -40,7 +39,7 @@ public class ServerGetHighscores : MonoBehaviour
                 case UnityWebRequest.Result.Success:
                     Debug.Log(pages[page] + ":\nReceived: " + webRequest.downloadHandler.text);
                     Highscores hs = JsonUtility.FromJson<Highscores>(webRequest.downloadHandler.text.Substring(1));
-                    Debug.Log(DBErrorHandler.ErrorMessage(hs.error));
+                    Debug.Log(DatabaseConnection.ErrorMessage(hs.error));
 
                     if (hs.error == 1)
                     {
@@ -49,19 +48,27 @@ public class ServerGetHighscores : MonoBehaviour
                             connId = incoming.connId,
                             cmd = MessageHandler.CommandType.HighscoreAccept,
                             userId = incoming.userId,
-                            type = webRequest.downloadHandler.text.Substring(1),
+                            message = webRequest.downloadHandler.text.Substring(1),
                         };
 
                         server.SendToClientConn4096(msg.connId, msg);
                     }
+                    else if (hs.error == 3)
+                    {
+                        GetComponent<ServerRelogin>().ReloginToServer();
+                    }
                     else
                     {
-                        //send error message to client?
+                        MessageHandler.Message msg = new MessageHandler.Message()
+                        {
+                            cmd = MessageHandler.CommandType.Error,
+                            message = DatabaseConnection.ErrorMessage(hs.error),
+                        };
+
+                        server.SendToClientConn512(incoming.connId, msg);
                     }
                     break;
             }
         }
-
-
     }
 }

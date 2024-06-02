@@ -1141,7 +1141,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1499,8 +1499,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec0dff25e0c03644d8c873854962b315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menu: {fileID: 503722145}
-  nextMenu: {fileID: 193993817}
   serverID: {fileID: 971768655}
   serverPW: {fileID: 1677856747}
 --- !u!1001 &685977311

@@ -99,22 +99,25 @@
             $set .= "password='$passsha'";
         }
 
-        if ($check == 1 && $set != "")
+        if ($check == 1)
         {
-            $query = "UPDATE users SET $set WHERE id=$userId";
-
-            if (!($result = $mysqli->query($query)))
+            if ($set != "")
             {
-                showerror($mysqli->errno,$mysqli->error);
+                $query = "UPDATE users SET $set WHERE id=$userId";
+
+                if (!($result = $mysqli->query($query)))
+                {
+                    showerror($mysqli->errno,$mysqli->error);
+                }
+                else
+                {
+                    echo "{\"error\":1}";
+                }
             }
             else
             {
-                echo "{\"error\":1}";
+                echo "{\"error\":2}";
             }
-        }
-        else
-        {
-            echo "{\"error\":2}";
         }
     }
 ?>

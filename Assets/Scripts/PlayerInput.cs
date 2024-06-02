@@ -1,31 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-
-using TMPro;
-
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerInput : MonoBehaviour
 {
-    public TMP_Text winLoseText;
-    public GameObject[] buttons;
-
-    public ClickType type = ClickType.None;
-    public bool turn = false;
-
-    private MessageHandler mh;
     private Client c;
+    private ClientTurn ct;
 
     private void Awake()
     {
-        mh = FindObjectOfType<MessageHandler>();
         c = FindObjectOfType<Client>();
+        ct = FindObjectOfType<ClientTurn>();
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && turn)
+        if (Input.GetMouseButtonDown(0) && ct.turn)
         {
             Vector2Int pos = MousePosToCellPos(Input.mousePosition);
 
@@ -33,6 +21,11 @@ public class PlayerInput : MonoBehaviour
             {
                 IsPosAvailable(pos);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            c.Disconnect();
         }
     }
 
@@ -60,49 +53,13 @@ public class PlayerInput : MonoBehaviour
     {
         MessageHandler.Message msg = new MessageHandler.Message()
         {
+            connId = DatabaseConnection.userData.connid,
             cmd = MessageHandler.CommandType.PlaceTypeRequest,
             userId = DatabaseConnection.userData.id,
             pos = _gridPos.x + "," + _gridPos.y,
-            type = type.ToString(),
+            type = ct.type.ToString(),
         };
 
         c.SendToServer(msg);
-    }
-
-    public void EndGame(ClickType _type)
-    {
-        winLoseText.enabled = true;
-
-        for (int i = 0; i < buttons.Length; i++)
-        {
-            buttons[i].SetActive(true);
-        }
-
-        if (type == _type)
-        {
-            winLoseText.text = "You win! :)";
-        }
-        else
-        {
-            winLoseText.text = "You lose! :(";
-        }
-    }
-
-    public void PlayAgain()
-    {
-        c.SendToServer(mh.C_SendNewGameRequest());
-
-        winLoseText.enabled = false;
-
-        for (int i = 0; i < buttons.Length; i++)
-        {
-            buttons[i].SetActive(false);
-        }
-    }
-
-    public void LeaveMatch()
-    {
-        c.Disconnect();
-        SceneManager.LoadScene(0);
     }
 }

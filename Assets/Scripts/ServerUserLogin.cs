@@ -1,7 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-
-using TMPro;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -44,7 +41,7 @@ public class ServerUserLogin : MonoBehaviour
             }
         }
 
-        Debug.Log(DBErrorHandler.ErrorMessage(DatabaseConnection.userData.error));
+        Debug.Log(DatabaseConnection.ErrorMessage(DatabaseConnection.userData.error));
 
         if (DatabaseConnection.userData.error == 1)
         {
@@ -58,9 +55,19 @@ public class ServerUserLogin : MonoBehaviour
 
             server.SendToClientConn512(msg.connId, msg);
         }
+        else if (DatabaseConnection.userData.error == 3)
+        {
+            GetComponent<ServerRelogin>().ReloginToServer();
+        }
         else
         {
-            //send error message to client?
+            MessageHandler.Message msg = new MessageHandler.Message()
+            {
+                cmd = MessageHandler.CommandType.Error,
+                message = DatabaseConnection.ErrorMessage(DatabaseConnection.userData.error),
+            };
+
+            server.SendToClientConn512(server.m_Connections.Length - 1, msg);
         }
     }
 }

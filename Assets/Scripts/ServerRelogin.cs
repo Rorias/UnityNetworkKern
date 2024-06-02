@@ -1,19 +1,13 @@
 using System.Collections;
 
-using TMPro;
-
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
-public class ServerLogin : MonoBehaviour
+public class ServerRelogin : MonoBehaviour
 {
-    public TMP_InputField serverID;
-    public TMP_InputField serverPW;
-
-    public void LoginToServer()
+    public void ReloginToServer()
     {
-        string url = "https://studenthome.hku.nl/~lars.mulder/server_login.php?" + "id=" + serverID.text + "&pw=" + serverPW.text;
+        string url = "https://studenthome.hku.nl/~lars.mulder/server_login.php?" + "id=1&pw=ikke";
 
         StartCoroutine(LoginToServer(url));
     }
@@ -45,10 +39,5 @@ public class ServerLogin : MonoBehaviour
         }
 
         Debug.Log(DatabaseConnection.ErrorMessage(DatabaseConnection.sessionId.error));
-
-        if (DatabaseConnection.sessionId.error == 1)//no errors
-        {
-            SceneManager.LoadScene(2);
-        }
     }
 }
