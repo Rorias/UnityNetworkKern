@@ -7,7 +7,7 @@
     $password = htmlspecialchars($_GET["pw"]);
 
     //server id is not an integer
-    if (!filter_var($serverId, FILTER_VALIDATE_INT)) {
+    if (filter_var($serverId, FILTER_VALIDATE_INT) === false) {
         $check = 0;
     }
 

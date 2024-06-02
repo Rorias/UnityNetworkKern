@@ -5,12 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class Client : MonoBehaviour
 {
-    public static string serverIP = "192.168.2.225";
-
     private MessageHandler msgHandler;
 
     private NetworkDriver m_Driver;
     private NetworkConnection m_Connection;
+
+    private string serverIP = "192.168.2.225";
 
     private void Start()
     {
@@ -18,6 +18,8 @@ public class Client : MonoBehaviour
 
         m_Connection = default(NetworkConnection);
 
+        serverIP = DatabaseConnection.IP;
+        Debug.Log("IP is " + serverIP);
         var endpoint = NetworkEndpoint.Parse(serverIP, 7777, NetworkFamily.Ipv4);
         endpoint.Port = 7777;
         m_Connection = m_Driver.Connect(endpoint);

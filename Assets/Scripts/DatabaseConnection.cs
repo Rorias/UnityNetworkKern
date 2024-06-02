@@ -5,6 +5,7 @@ public class DatabaseConnection
     [NonSerialized] public static ServerResult sessionId;
     [NonSerialized] public static UserResult userData;
     [NonSerialized] public static User user;
+    [NonSerialized] public static string IP;
 
     public static string ErrorMessage(int _errNum)
     {

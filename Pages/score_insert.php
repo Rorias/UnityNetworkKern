@@ -24,11 +24,11 @@
         $score = $_GET["score"];
         $win = $_GET["win"];
 
-        if (!filter_var($user_id, FILTER_VALIDATE_INT)) {
+        if (filter_var($user_id, FILTER_VALIDATE_INT) === false) {
             $check = 0;
         }
 
-        if (!filter_var($score, FILTER_VALIDATE_INT)) {
+        if (filter_var($score, FILTER_VALIDATE_INT) === false) {
             $check = 0;
         }
 
